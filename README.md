@@ -126,3 +126,17 @@ Reload the configuration file:
 sudo /etc/init.d/nginx reload
 ```
 
+## Install ImageMagick
+```
+sudo apt-get install imagemagick
+```
+
+then, in order for imagemagick to be able to convert pdf document, edit `/etc/ImageMagick-7/policy.xml` file.
+Find a row that contains:
+```
+<policy domain="coder" rights="none" pattern="PDF" />
+```
+wrap  it between <!-- and --> to comment it.
+
+
+And finally, clone this repo into `/var/www/html`.
