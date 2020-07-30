@@ -4,48 +4,29 @@
 
         if($_POST["q"] == "upload"){
 
-            $allowed_types = array ( 'application/pdf', 'image/jpeg', 'image/png', 'image/gif' );
-            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-            $detected_type = finfo_file( $fileInfo, $_FILES["fileToUpload"]["tmp_name"] );
+        $file_type = $_FILES['fileToUpload']['type'];
 
-            if ( !in_array($detected_type, $allowed_types) ) {
-                die ( 'Please upload a pdf or an image ' );
-            }
-            finfo_close( $fileInfo );
+        if (!in_array($file_type, $allowed_types)) {
+            die('Unsupported file type! Allowed: image, pdf, doc, docx, xls, xlsx, ppt, pptx');
+        }
+	
+       $filename = strtotime("now");
 
+        
+        $extension = strtolower(preg_replace('/\W/', '', pathinfo($_FILES["fileToUpload"]["name"])['extension']));
+        $target_file = FILES_DIR  . $filename . "." . $extension;
 
-            
-            $filename = strtotime("now");
-            switch($detected_type){
-                case 'application/pdf': 
-                    $extension = 'pdf';
-                    break;
-                case 'image/jpeg': 
-                    $extension ='jpeg';
-                    break;
-                case 'image/png': 
-                    $extension ='png';
-                    break;
-                case 'image/gif': 
-                    $extension = 'gif';
-                break;
-            }
+        move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file);
 
-            $target_file = FILES_DIR  . $filename . "." . $extension;
+        if ($extension == 'jpg' || $extension == 'jpeg' || $extension == 'png' || $extension == 'gif' ) {
+            $orifile    = $target_file;
 
-            move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file);
-            
-            if($extension == 'pdf'){
-                $orifile    = $target_file.'[0]';
-            }else{
-                $orifile    = $target_file;
-            }
-            $thumbfile  = THUMBNAILS_DIR . $filename . '.jpeg';
+        } else {
+            $orifile    = $target_file.'[0]';
+        }
 
-
-
-            $a = shell_exec("convert $orifile $thumbfile");
-
+        $thumbfile  = THUMBNAILS_DIR . $filename . '.jpeg';
+        shell_exec("convert $orifile $thumbfile");
 
         }elseif($_POST["q"] == "print"){
 
@@ -59,8 +40,14 @@
             $digits = preg_replace("/[^0-9]/", "",$_POST["filename"] ).".";
             $files = glob(FILES_DIR.$digits.'*');
             $filepath = $files[0];
+	    $filename = end(explode('/',$filepath));
+	    $ext = end(explode('.', $filename));
 
-            $a = shell_exec("lp -d ". PRINTER ." -o media=A4 $filepath");
+            if($ext == 'jpeg' || $ext == 'jpg' || $ext == 'png' || $ext == 'gif' || $ext == 'pdf' ){
+                shell_exec("lp -d ". PRINTER ." -o media=A4 $filepath");
+            }else{
+                shell_exec("libreoffice --headless --pt " .PRINTER. " $filepath");
+            }
 
         }elseif($_POST["q"] == 'delete'){
 

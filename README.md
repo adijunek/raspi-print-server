@@ -138,5 +138,12 @@ Find a row that contains:
 ```
 wrap  it between <!-- and --> to comment it.
 
+## Install LibreOffice
+In order for Raspi to be able to print MS Office documents (Doc, Excel, PowerPoint), we should install LibreOfiice
 
-And finally, clone this repo into `/var/www/html`.
+```
+sudo apt-get install libreoffice
+```
+
+
+And finally, clone this repo into `/var/www/html`. Edit PRINTER constant in `config.php'

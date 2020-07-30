@@ -4,12 +4,20 @@
   <title>Print Server</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel='shortcut icon' type='image/x-icon' href='favicon.ico' />
-  <link rel="icon" href="icon/favicon-16x16.png" sizes="16x16">
-  <link rel="icon" href="icon/favicon-32x32.png" sizes="32x32">
-  <link rel="shortcut icon" href="icon/android-chrome-192x192.png" sizes="192x192">
-  <link rel="shortcut icon" href="icon/android-chrome-512x512.png" sizes="512x512">
-  <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="57x57" href="icons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="icons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="icons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="icons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="icons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="icons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="icons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+
 
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <script src="js/jquery-3.5.1.min.js"></script>
@@ -62,7 +70,7 @@
 ?>
 
 <div id="loading">
-    <img id="loading-image" src="icon/spinner.svg" alt="Wait..." />
+    <img id="loading-image" src="icons/spinner.svg"/>
 </div>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
@@ -84,10 +92,11 @@
     
     $files = array_diff(scandir(FILES_DIR,SCANDIR_SORT_DESCENDING), array('..', '.'));
     
-    
+    $i=1;
     foreach($files as $file){
 	$exploded = explode(".", $file);
 	$thumb_file = $exploded[0].'.jpeg';
+	//$thumb_file = $exploded[0].'.'.$exploded[1];
         ?>
             <div class="row">
                     <div class="col-sm-12 text-center">
@@ -100,10 +109,10 @@
                 <table class="table table-borderless">
                     <tr>
                         <td class="text-right">
-                            <form id="print-form" action="index.php" method="post">
+                            <form class="print-form" id="print_form_<?=$i?>" action="index.php" method="post">
                                 <input type="hidden" name="filename" value="<?=$file?>">
 				<input type="hidden" name="q" value="print">
-                                <button id="print-button" type="button" class="btn btn-primary">Print</button> 
+                                <button id="print-button" data-id="<?=$i?>" type="button" class="btn btn-primary">Print</button> 
                             </form>                             
                         </td>
                         <td class="text-left">
@@ -120,6 +129,7 @@
             </div>
             <br>
         <?php
+	$i++;
     }
 ?>
  
@@ -150,12 +160,13 @@
         $("#loading").show();
         $("#loading-image").show();
 
-        $("form#print-form").on('click', "#print-button", function(e){
+        $("form.print-form").on('click', "#print-button", function(e){
             e.preventDefault();
+	   var i=$(this).data('id');
             $("#loading").show();
             $("#loading-image").show();
             $("#print-button").prop('disabled', true);
-            $("form#print-form").submit();
+            $("form#print_form_"+i).submit();
 
         });
 
