@@ -75,6 +75,43 @@ Connect raspberry pi to an usb printer. Use the lpstat(1) command to see a list 
 lpstat -p -d
 ```
 
+Adding your printer to CUPS can be doen through CUPS administration web page at `http://[your-raspi-ip]:631`
+
+## Install Samba
+Samba is an interoperability tool that allows for easy communication between windows and linux or unix programs and it will be used to allow our windows based system to communicate with CUPS running on the Raspberry Pi to print.
+
+While cups is being installed, it installs other dependencies like samba, but just in case it wasn’t installed, you can install it by following the procedure below.
+```
+sudo apt-get install samba
+```
+Then edit samba configuration file.
+```
+sudo nano /etc/samba/samba.conf 
+```
+
+n the conf file, scroll to the print section and change the; guest ok = no to guest ok = yes
+```
+guest ok = yes
+```
+
+Also under the printer driver section, change the; read only = yes to read only  = no
+```
+read only  = no
+```
+With this all done save the file using ctrl+X followed by y and enter.
+
+After saving the file restart samba to effect the changes using;
+```
+sudo /etc/init.d/samba restart
+```
+At this point you should be able to print documents remotely from your PC, by adding pi remote printer to your PC.
+For mobile devices to be able to use wireless remote printer, you should install 3rd application like Let's Print Droid.
+But if you don't want to install 3rd party app, you may continue with following steps:
+ 
+We're going to setup a web server on the Raspberry Pi where remote users could upload documents (images, pdf, ms office documents) to Raspberry Pi and then print them. Users could use PCs or mobile devices that are connected to the same LAN with the Raspberry Pi.
+
+
+
 ## Install Nginx
 ```
 sudo apt install nginx
@@ -127,6 +164,9 @@ sudo /etc/init.d/nginx reload
 ```
 
 ## Install ImageMagick
+
+ImageMagick is needed for the Pi to be able create thumbnails of any document you upload through web page.
+
 ```
 sudo apt-get install imagemagick
 ```
@@ -139,11 +179,17 @@ Find a row that contains:
 wrap  it between <!-- and --> to comment it.
 
 ## Install LibreOffice
-In order for Raspi to be able to print MS Office documents (Doc, Excel, PowerPoint), we should install LibreOfiice
+CUPS does not natively support printing MS Office documents (Doc, Excel, PowerPoint), in order for our Print Server to be able to print MS Office Documents, we're going to install LibreOffice.
 
 ```
 sudo apt-get install libreoffice
 ```
+If you're using older raspi (or raspi zero) like me, the installation will complain about can not find java home. This is because java Server VM is only supported on ARMv7+ VFP, which we don't have in our old Raspberry Pi.
+But we can ignore that since we will only use LibreOffice headlessly to print MS Office documents.
 
+So, now we have everything set up, all we need is codes for Print Server Web Interface.
+Clone this repo into `/var/www/html`. Edit PRINTER constant in `config.php'
 
-And finally, clone this repo into `/var/www/html`. Edit PRINTER constant in `config.php'
+Now you can acces our Raspberry Print Server at `http://raspberry-ip`
+
+Good Luck!
